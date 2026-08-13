@@ -141,7 +141,7 @@ func main() {
 	for _, insert := range all_inserts {
 		err := add_insert_to_wav(output, insert)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n")
+			fmt.Fprintf(os.Stderr, "%v\n", err)
 		}
 	}
 
