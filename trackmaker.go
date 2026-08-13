@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fohristiwhirl/wavmaker"
+	"github.com/rooklift/wavmaker"
 )
 
 var midi_freq [128]float64 = [128]float64{
