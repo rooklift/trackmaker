@@ -146,7 +146,11 @@ func main() {
 	}
 
 	output.FadeSamples(44100)
-	output.Save("trackmaker_output.wav")
+	err = output.Save("trackmaker_output.wav")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
 	fmt.Printf("Output: %v\n", output)
 }
 
@@ -290,7 +294,7 @@ func handle_score_line(global_state *ParserState, text string) []Insertion {
 
 			if strings.HasPrefix(token, "j:") {
 				j, err := strconv.Atoi(token[2:])
-				if err != nil {
+				if err != nil || j < 0 {
 					fmt.Fprintf(os.Stderr, "line %d: bad token \"%s\"\n", relevant_state.line, token)
 				} else {
 					relevant_state.jump = uint32(j)
@@ -302,7 +306,7 @@ func handle_score_line(global_state *ParserState, text string) []Insertion {
 
 			if strings.HasPrefix(token, "o:") {
 				o, err := strconv.Atoi(token[2:])
-				if err != nil {
+				if err != nil || o < 0 {
 					fmt.Fprintf(os.Stderr, "line %d: bad token \"%s\"\n", relevant_state.line, token)
 				} else {
 					relevant_state.offset = uint32(o)
@@ -340,6 +344,8 @@ func handle_score_line(global_state *ParserState, text string) []Insertion {
 				l, err := strconv.Atoi(token[2:])
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "line %d: bad token \"%s\"\n", relevant_state.line, token)
+				} else if l < 0 {
+					relevant_state.length = 4294967295		// Negative l: is an established idiom meaning "whole sample"
 				} else {
 					relevant_state.length = uint32(l)
 				}
@@ -350,7 +356,7 @@ func handle_score_line(global_state *ParserState, text string) []Insertion {
 
 			if strings.HasPrefix(token, "f:") {
 				f, err := strconv.Atoi(token[2:])
-				if err != nil {
+				if err != nil || f < 0 {
 					fmt.Fprintf(os.Stderr, "line %d: bad token \"%s\"\n", relevant_state.line, token)
 				} else {
 					relevant_state.fadeout = uint32(f)
